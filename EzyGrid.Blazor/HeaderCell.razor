@@ -1,0 +1,67 @@
+﻿@typeparam TItem
+<th>
+    @if (AllowSort)
+    {
+        <a @onclick="OnSortChange" style="cursor: pointer; width: 100%; display: inline-block;">
+            @Display
+            <span style="margin-left: 5px;">
+                @if (PagedEzyGridModel.SortField == SortField)
+                {
+                    if (SortDirection == "desc")
+                    {
+                        <text>&#21C2;</text>
+                    }
+                    else if (SortDirection == "asc")
+                    {
+                        <text>&#21BE;</text>
+                    }
+                }
+            </span>
+        </a>
+    }
+    else
+    {
+        @Display
+    }
+</th>
+
+@code {
+    [Parameter]
+    public string Display { get; set; }
+
+    [Parameter]
+    public bool AllowSort { get; set; } = true;
+
+    [Parameter]
+    public string SortDirection { get; set; }
+
+    [Parameter]
+    public string SortField { get; set; }
+
+    [Parameter]
+    public PagedEzyGridModel PagedEzyGridModel { get; set; } = new PagedEzyGridModel();
+
+    [Parameter]
+    public EventCallback<PagedEzyGridModel> OnChange { get; set; }
+
+    public string SortDirectionSelected { get; set; } = "asc";
+
+    public async Task OnSortChange()
+    {
+        ChangeSortDirection();
+
+        PagedEzyGridModel.SortDirection = SortDirection;
+        PagedEzyGridModel.SortField = SortField;
+        PagedEzyGridModel.ResetCurrentPage();
+
+        await OnChange.InvokeAsync(PagedEzyGridModel);
+    }
+
+    void ChangeSortDirection()
+    {
+        if (SortDirection == "asc" || string.IsNullOrEmpty(SortDirection))
+            SortDirection = "desc";
+        else
+            SortDirection = "asc";
+    }
+}
