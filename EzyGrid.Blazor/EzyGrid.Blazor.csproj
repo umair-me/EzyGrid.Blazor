@@ -1,10 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
+    <Summary>An easy to use blazor grid view.</Summary>
+    <Description>An easy to use blazor grid view.</Description>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <PackageId>EzyGrid.Blazor</PackageId>
     <RazorLangVersion>3.0</RazorLangVersion>
-    <Description>EzyGrid.Blazor</Description>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageProjectUrl>https://github.com/umair-me/EzyGrid.Blazor</PackageProjectUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Version>1.0.1</Version>
+    <Authors>M Umair Irshad</Authors>
+    <PackageTags>gridview; blazor grid; blazor gridview; list; datagrid;</PackageTags>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,7 +24,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="JW.Pager" Version="1.0.1" />
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.0" />
     <PackageReference Include="Microsoft.AspNetCore.Components.Web" Version="3.1.0" />
   </ItemGroup>
