@@ -1,0 +1,33 @@
+name: Nuget Publish
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Publish
+      with:
+        PROJECT_FILE_PATH: EzyGrid.Blazor/EzyGrid.Blazor.csproj
+        NUGET_KEY: ${{secrets.NUGET_API_KEY}}
+        INCLUDE_SYMBOLS: true
+        
