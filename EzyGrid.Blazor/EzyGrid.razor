@@ -16,12 +16,13 @@
         </div>
         <div style="float: right; margin-bottom: 10px;">
             <EditForm OnValidSubmit="SearchSubmit" Model="PagedEzyGridModel">
-                <input type="text" placeholder="Search..." @bind="PagedEzyGridModel.SearchText" id="@SearchBoxElementId" />
+                <input type="search" placeholder="Search..." @bind="PagedEzyGridModel.SearchText" id="@SearchBoxElementId" class="@SearchCssClass" />
                 <input type="submit" style="width: 0; height: 0; display: none; visibility: hidden;" value="Search" />
             </EditForm>
         </div>
     }
-    <table class="@TableCssClass">
+
+    <table class="@TableCssClass" style="width: 100%">
 
         <thead>
             <tr>
@@ -74,17 +75,17 @@
 
     @if (PagedEzyGridResult.Items.Any())
     {
-        <div style="text-align: right;">
-            <button @onclick="@(() => ToPage(0))" disabled="@(0 == PagedEzyGridModel.CurrentPage)" style="min-width: 42px;">&laquo;</button>
-            <button @onclick="PreviousPage" disabled="@PreviousDisabled" style="min-width: 42px;">&lsaquo;</button>
+        <div style="text-align: right;" class="@PageButtonContainerCssClass">
+            <button @onclick="@(() => ToPage(0))" disabled="@(0 == PagedEzyGridModel.CurrentPage)" style="min-width: 42px;border: none;background: none;padding: 5px;">&laquo;</button>
+            <button @onclick="PreviousPage" disabled="@PreviousDisabled" style="min-width: 42px;border: none;background: none;padding: 5px;">&lsaquo;</button>
 
             @foreach (var pageNavigate in PageNavigation)
             {
-                <button @onclick="@(() => ToPage(pageNavigate - 1))" disabled="@(pageNavigate == (PagedEzyGridModel.CurrentPage + 1))" style="min-width: 42px;">@pageNavigate</button>
+                <button @onclick="@(() => ToPage(pageNavigate - 1))" disabled="@(pageNavigate == (PagedEzyGridModel.CurrentPage + 1))" style="min-width: 42px;border: none;background: none;padding: 5px;">@pageNavigate</button>
             }
 
-            <button @onclick="NextPage" disabled="@NextDisabled" style="min-width: 42px;">&rsaquo;</button>
-            <button @onclick="@(() => ToPage(TotalPages - 1))" disabled="@(TotalPages - 1 == PagedEzyGridModel.CurrentPage)" style="min-width: 42px;">&raquo;</button>
+            <button @onclick="NextPage" disabled="@NextDisabled" style="min-width: 42px;border: none;background: none;padding: 5px;">&rsaquo;</button>
+            <button @onclick="@(() => ToPage(TotalPages - 1))" disabled="@(TotalPages - 1 == PagedEzyGridModel.CurrentPage)" style="min-width: 42px;border: none;background: none;padding: 5px;">&raquo;</button>
         </div>
 
         <p>
@@ -102,8 +103,10 @@
     [Parameter] public RenderFragment LoadingTemplate { get; set; }
     [Parameter] public PagedEzyGridResult<TItem> PagedEzyGridResult { get; set; } = new PagedEzyGridResult<TItem>();
     [Parameter] public EventCallback<PagedEzyGridModel> OnChange { get; set; }
-    [Parameter] public string TableCssClass { get; set; } = "table table-sm table-responsive-sm";
+    [Parameter] public string TableCssClass { get; set; } = "";
     [Parameter] public string EzyGridCssClass { get; set; } = "";
+    [Parameter] public string SearchCssClass { get; set; } = "";
+    [Parameter] public string PageButtonContainerCssClass { get; set; } = "";
     [Parameter] public bool ShowSearch { get; set; } = true;
     [Parameter] public string DefaultSortField { get; set; }
     [Parameter] public string DefaultSortDirection { get; set; }
@@ -127,6 +130,7 @@
 
         if (!string.IsNullOrEmpty(DefaultSortField))
             PagedEzyGridModel.SortField = DefaultSortField;
+
         if (!string.IsNullOrEmpty(DefaultSortDirection))
             PagedEzyGridModel.SortDirection = DefaultSortDirection;
 
