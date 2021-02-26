@@ -7,7 +7,7 @@
     {
         <div style="float: left; margin-bottom: 10px;">
             <span>Page size:</span>
-            <select @onchange="@(async (e) => await OnPageSizeChanged(e))" style="min-height: 30px;">
+            <select @onchange="@(async (e) => await OnPageSizeChanged(e))" style="min-height: 30px;" class="@PageSizeCssClass">
                 @foreach (var pageSize in PageSizes)
                 {
                     <option selected="@(pageSize == PagedEzyGridModel.PageSize)">@pageSize</option>
@@ -103,10 +103,11 @@
     [Parameter] public RenderFragment LoadingTemplate { get; set; }
     [Parameter] public PagedEzyGridResult<TItem> PagedEzyGridResult { get; set; } = new PagedEzyGridResult<TItem>();
     [Parameter] public EventCallback<PagedEzyGridModel> OnChange { get; set; }
-    [Parameter] public string TableCssClass { get; set; } = "";
-    [Parameter] public string EzyGridCssClass { get; set; } = "";
-    [Parameter] public string SearchCssClass { get; set; } = "";
-    [Parameter] public string PageButtonContainerCssClass { get; set; } = "";
+    [Parameter] public string TableCssClass { get; set; }
+    [Parameter] public string EzyGridCssClass { get; set; }
+    [Parameter] public string SearchCssClass { get; set; }
+    [Parameter] public string PageButtonContainerCssClass { get; set; }
+    [Parameter] public string PageSizeCssClass { get; set; }
     [Parameter] public bool ShowSearch { get; set; } = true;
     [Parameter] public string DefaultSortField { get; set; }
     [Parameter] public string DefaultSortDirection { get; set; }
