@@ -1,6 +1,6 @@
 ﻿namespace EzyGrid.Blazor
 {
-    public class PagedEzyGridModel
+    public class EzyGridModel
     {
         public int CurrentPage { get; set; } = 0;
 

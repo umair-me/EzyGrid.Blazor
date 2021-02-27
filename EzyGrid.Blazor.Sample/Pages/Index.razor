@@ -1,0 +1,27 @@
+﻿@page "/"
+@inherits IndexBase
+@using EzyGrid.Blazor.Sample.Models
+
+<h3>Hello EzyGrid !</h3>
+
+<EzyGrid TItem="Customer" DefaultSortField="Name" DefaultSortDirection="asc" EzyGridResult="EzyGridResult" OnChange="@OnGridChanged" TableCssClass="table table-striped" DefaultPageSize="10" SearchCssClass="form-control">
+    <TableHeader>
+        <HeaderCell TItem="Customer" Display="Name" SortField="Name"></HeaderCell>
+        <HeaderCell TItem="Customer" Display="Contact Name" SortField="ContactName"></HeaderCell>
+        <HeaderCell TItem="Customer" Display="Phone" SortField="Phone"></HeaderCell>
+        <HeaderCell TItem="Customer" Display="Country" SortField="Country"></HeaderCell>
+        <HeaderCell TItem="Customer" Display="City" SortField="City"></HeaderCell>
+        <HeaderCell TItem="Customer" Display="Zip Code" SortField="ZipCode"></HeaderCell>
+    </TableHeader>
+    <RowTemplate Context="rowItem">
+        <td>@rowItem.Name</td>
+        <td>@rowItem.ContactName</td>
+        <td>@rowItem.Phone</td>
+        <td>@rowItem.Country</td>
+        <td>@rowItem.City</td>
+        <td>@rowItem.ZipCode</td>
+    </RowTemplate>
+    <LoadingTemplate>
+        <p>Loading...</p>
+    </LoadingTemplate>
+</EzyGrid>

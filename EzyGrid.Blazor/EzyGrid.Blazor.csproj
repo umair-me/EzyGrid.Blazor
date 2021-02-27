@@ -3,7 +3,7 @@
   <PropertyGroup>
     <Summary>An easy to use blazor grid view.</Summary>
     <Description>An easy to use blazor grid view.</Description>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <PackageId>EzyGrid.Blazor</PackageId>
     <RazorLangVersion>3.0</RazorLangVersion>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
@@ -11,17 +11,10 @@
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-    <Version>1.0.2</Version>
+    <Version>1.0.3</Version>
     <Authors>M Umair Irshad</Authors>
     <PackageTags>gridview; blazor grid; blazor gridview; list; datagrid;</PackageTags>
   </PropertyGroup>
-
-  <ItemGroup>
-    <!-- .js/.css files will be referenced via <script>/<link> tags; other content files will just be included in the app's 'dist' directory without any tags referencing them -->
-    <EmbeddedResource Include="content\**\*.js" LogicalName="blazor:js:%(RecursiveDir)%(Filename)%(Extension)" />
-    <EmbeddedResource Include="content\**\*.css" LogicalName="blazor:css:%(RecursiveDir)%(Filename)%(Extension)" />
-    <EmbeddedResource Include="content\**" Exclude="**\*.js;**\*.css" LogicalName="blazor:file:%(RecursiveDir)%(Filename)%(Extension)" />
-  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Components" Version="3.1.0" />

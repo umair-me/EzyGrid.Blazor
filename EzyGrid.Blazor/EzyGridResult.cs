@@ -2,7 +2,7 @@
 
 namespace EzyGrid.Blazor
 {
-    public class PagedEzyGridResult<T>
+    public class EzyGridResult<T>
     {
         public int TotalItems { get; set; }
 

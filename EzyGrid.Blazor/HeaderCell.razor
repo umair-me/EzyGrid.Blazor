@@ -5,7 +5,7 @@
         <a @onclick="OnSortChange" style="cursor: pointer; width: 100%; display: inline-block;">
             @Display
             <span style="margin-left: 5px;">
-                @if (PagedEzyGridModel.SortField == SortField)
+                @if (EzyGrid.EzyGridModel.SortField == SortField)
                 {
                     if (SortDirection == "desc")
                     {
@@ -26,23 +26,13 @@
 </th>
 
 @code {
-    [Parameter]
-    public string Display { get; set; }
 
-    [Parameter]
-    public bool AllowSort { get; set; } = true;
+    [CascadingParameter] public EzyGridBase<TItem> EzyGrid { get; set; }
 
-    [Parameter]
-    public string SortDirection { get; set; }
-
-    [Parameter]
-    public string SortField { get; set; }
-
-    [Parameter]
-    public PagedEzyGridModel PagedEzyGridModel { get; set; } = new PagedEzyGridModel();
-
-    [Parameter]
-    public EventCallback<PagedEzyGridModel> OnChange { get; set; }
+    [Parameter] public string Display { get; set; }
+    [Parameter] public bool AllowSort { get; set; } = true;
+    [Parameter] public string SortDirection { get; set; }
+    [Parameter] public string SortField { get; set; }
 
     public string SortDirectionSelected { get; set; } = "asc";
 
@@ -50,11 +40,11 @@
     {
         ChangeSortDirection();
 
-        PagedEzyGridModel.SortDirection = SortDirection;
-        PagedEzyGridModel.SortField = SortField;
-        PagedEzyGridModel.ResetCurrentPage();
+        EzyGrid.EzyGridModel.SortDirection = SortDirection;
+        EzyGrid.EzyGridModel.SortField = SortField;
+        EzyGrid.EzyGridModel.ResetCurrentPage();
 
-        await OnChange.InvokeAsync(PagedEzyGridModel);
+        await EzyGrid.OnChange.InvokeAsync(EzyGrid.EzyGridModel);
     }
 
     void ChangeSortDirection()

@@ -1,6 +1,6 @@
-﻿@using Microsoft.AspNetCore.Components.Forms
+﻿@typeparam TItem
+@inherits EzyGridBase<TItem>
 
-@typeparam TItem
 <div class="@EzyGridCssClass">
 
     @if (ShowSearch)
@@ -10,15 +10,12 @@
             <select @onchange="@(async (e) => await OnPageSizeChanged(e))" style="min-height: 30px;" class="@PageSizeCssClass">
                 @foreach (var pageSize in PageSizes)
                 {
-                    <option selected="@(pageSize == PagedEzyGridModel.PageSize)">@pageSize</option>
+                    <option selected="@(pageSize == EzyGridModel.PageSize)">@pageSize</option>
                 }
             </select>
         </div>
         <div style="float: right; margin-bottom: 10px;">
-            <EditForm OnValidSubmit="SearchSubmit" Model="PagedEzyGridModel">
-                <input type="search" placeholder="Search..." @bind="PagedEzyGridModel.SearchText" id="@SearchBoxElementId" class="@SearchCssClass" />
-                <input type="submit" style="width: 0; height: 0; display: none; visibility: hidden;" value="Search" />
-            </EditForm>
+            <input type="search" placeholder="@SearchTextPlaceholder" id="@SearchBoxElementId" class="@SearchCssClass" @bind-value="SearchText" @bind-value:event="oninput" />
         </div>
     }
 
@@ -26,7 +23,9 @@
 
         <thead>
             <tr>
-                @TableHeader
+                <CascadingValue Value="this">
+                    @TableHeader
+                </CascadingValue>
             </tr>
         </thead>
 
@@ -47,14 +46,14 @@
                 </tr>
             }
 
-            @if (PagedEzyGridResult.Items != null)
+            @if (EzyGridResult.Items != null)
             {
-                foreach (var item in PagedEzyGridResult.Items)
+                foreach (var item in EzyGridResult.Items)
                 {
                     <tr>@RowTemplate(item)</tr>
                 }
 
-                if (!PagedEzyGridResult.Items.Any() && !IsLoading)
+                if (!EzyGridResult.Items.Any() && !IsLoading)
                 {
                     <tr>
                         <td colspan="300" style="text-align: center;">
@@ -73,19 +72,19 @@
         }
     </table>
 
-    @if (PagedEzyGridResult.Items.Any())
+    @if (EzyGridResult.Items.Any())
     {
         <div style="text-align: right;" class="@PageButtonContainerCssClass">
-            <button @onclick="@(() => ToPage(0))" disabled="@(0 == PagedEzyGridModel.CurrentPage)" style="min-width: 42px;border: none;background: none;padding: 5px;">&laquo;</button>
+            <button @onclick="@(() => ToPage(0))" disabled="@(0 == EzyGridModel.CurrentPage)" style="min-width: 42px;border: none;background: none;padding: 5px;">&laquo;</button>
             <button @onclick="PreviousPage" disabled="@PreviousDisabled" style="min-width: 42px;border: none;background: none;padding: 5px;">&lsaquo;</button>
 
             @foreach (var pageNavigate in PageNavigation)
             {
-                <button @onclick="@(() => ToPage(pageNavigate - 1))" disabled="@(pageNavigate == (PagedEzyGridModel.CurrentPage + 1))" style="min-width: 42px;border: none;background: none;padding: 5px;">@pageNavigate</button>
+                <button @onclick="@(() => ToPage(pageNavigate - 1))" disabled="@(pageNavigate == (EzyGridModel.CurrentPage + 1))" style="min-width: 42px;border: none;background: none;padding: 5px;">@pageNavigate</button>
             }
 
             <button @onclick="NextPage" disabled="@NextDisabled" style="min-width: 42px;border: none;background: none;padding: 5px;">&rsaquo;</button>
-            <button @onclick="@(() => ToPage(TotalPages - 1))" disabled="@(TotalPages - 1 == PagedEzyGridModel.CurrentPage)" style="min-width: 42px;border: none;background: none;padding: 5px;">&raquo;</button>
+            <button @onclick="@(() => ToPage(TotalPages - 1))" disabled="@(TotalPages - 1 == EzyGridModel.CurrentPage)" style="min-width: 42px;border: none;background: none;padding: 5px;">&raquo;</button>
         </div>
 
         <p>
@@ -93,120 +92,3 @@
         </p>
     }
 </div>
-
-@code {
-    [Inject] public Microsoft.JSInterop.IJSRuntime JsRuntime { get; set; }
-
-    [Parameter] public RenderFragment TableHeader { get; set; }
-    [Parameter] public RenderFragment<TItem> RowTemplate { get; set; }
-    [Parameter] public RenderFragment TableFooter { get; set; }
-    [Parameter] public RenderFragment LoadingTemplate { get; set; }
-    [Parameter] public PagedEzyGridResult<TItem> PagedEzyGridResult { get; set; } = new PagedEzyGridResult<TItem>();
-    [Parameter] public EventCallback<PagedEzyGridModel> OnChange { get; set; }
-    [Parameter] public string TableCssClass { get; set; }
-    [Parameter] public string EzyGridCssClass { get; set; }
-    [Parameter] public string SearchCssClass { get; set; }
-    [Parameter] public string PageButtonContainerCssClass { get; set; }
-    [Parameter] public string PageSizeCssClass { get; set; }
-    [Parameter] public bool ShowSearch { get; set; } = true;
-    [Parameter] public string DefaultSortField { get; set; }
-    [Parameter] public string DefaultSortDirection { get; set; }
-    [Parameter] public bool DisableSearchAutofocus { get; set; }
-    [Parameter] public int DefaultPageSize { get; set; } = 10;
-
-    public int[] PageSizes { get; set; } = { 2, 10, 25, 50, 100, 200 };
-    public int[] PageNavigation { get; set; } = { };
-    public PagedEzyGridModel PagedEzyGridModel { get; set; } = new PagedEzyGridModel();
-    public bool HasPrevious => PagedEzyGridModel.CurrentPage - 1 >= 0;
-    public bool HasNext => PagedEzyGridModel.CurrentPage + 1 < TotalPages;
-    public int TotalPages => (int)Math.Ceiling(((double)PagedEzyGridResult.TotalItems / PagedEzyGridModel.PageSize));
-    public bool PreviousDisabled => !HasPrevious;
-    public bool NextDisabled => !HasNext;
-    public bool IsLoading { get; set; }
-    public string SearchBoxElementId { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        SearchBoxElementId = Guid.NewGuid().ToString();
-
-        if (!string.IsNullOrEmpty(DefaultSortField))
-            PagedEzyGridModel.SortField = DefaultSortField;
-
-        if (!string.IsNullOrEmpty(DefaultSortDirection))
-            PagedEzyGridModel.SortDirection = DefaultSortDirection;
-
-        if (DefaultPageSize > 0)
-            PagedEzyGridModel.PageSize = DefaultPageSize;
-
-        await RefreshGrid();
-    }
-
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            if (!DisableSearchAutofocus)
-            {
-                await JsRuntime.InvokeAsync<string>("BlazorEzyGrid.focusElement", new[] { SearchBoxElementId });
-            }
-        }
-    }
-
-    public async Task PreviousPage()
-    {
-        if (HasPrevious)
-        {
-            PagedEzyGridModel.CurrentPage--;
-            await RefreshGrid();
-        }
-    }
-
-    public async Task NextPage()
-    {
-        if (HasNext)
-        {
-            PagedEzyGridModel.CurrentPage++;
-            await RefreshGrid();
-        }
-    }
-
-    public async Task ToPage(int page)
-    {
-        if (page >= 0 && page < TotalPages)
-        {
-            PagedEzyGridModel.CurrentPage = page;
-            await RefreshGrid();
-        }
-    }
-
-    public async Task RefreshGrid()
-    {
-        IsLoading = true;
-        await OnChange.InvokeAsync(PagedEzyGridModel);
-        var pager = new JW.Pager(PagedEzyGridResult.TotalItems, PagedEzyGridModel.CurrentPage + 1, PagedEzyGridModel.PageSize, 6);
-        PageNavigation = pager.Pages.ToArray();
-        IsLoading = false;
-    }
-
-    public string GetPageSummary()
-    {
-        var startEntryCount = PagedEzyGridModel.CurrentPage == 0 ? 1 : PagedEzyGridModel.CurrentPage * PagedEzyGridModel.PageSize;
-        var endEntryCount = HasNext ? PagedEzyGridModel.CurrentPage * PagedEzyGridModel.PageSize + PagedEzyGridModel.PageSize : PagedEzyGridResult.TotalItems;
-
-        return $"Record {startEntryCount} to {endEntryCount} of {PagedEzyGridResult.TotalItems} (Page {PagedEzyGridModel.CurrentPage + 1}  of {TotalPages})";
-    }
-
-    public async Task SearchSubmit()
-    {
-        PagedEzyGridModel.ResetCurrentPage();
-        await RefreshGrid();
-    }
-
-    public async Task OnPageSizeChanged(ChangeEventArgs e)
-    {
-        var selectedString = e.Value.ToString();
-        PagedEzyGridModel.PageSize = int.Parse(selectedString);
-        PagedEzyGridModel.ResetCurrentPage();
-        await RefreshGrid();
-    }
-}
